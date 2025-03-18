@@ -35,14 +35,29 @@ const sensorsData: SensorData[] = [
 interface SensorProps {
     position: [number, number, number];
     onClick: () => void;
+    zone: SensorData["zone"]
 }
 
-const Sensor: React.FC<SensorProps> = ({ position, onClick }) => (
-    <mesh position={position} onClick={onClick}>
-        <sphereGeometry args={[0.3, 16, 16]} />
-        <meshStandardMaterial color="red" emissive="red" emissiveIntensity={0.5} />
-    </mesh>
-);
+const Sensor: React.FC<SensorProps> = ({ position, onClick, zone }) => {
+
+    let color = "#FFFFFF"
+    if (zone === "bocamina") {
+        color = "blue"
+    }
+    if (zone === "extraction") {
+        color = "gray"
+    }
+    if (zone === "tunel") {
+        color = "#2268e0"
+    }
+    return (
+
+        <mesh position={position} onClick={onClick}>
+            <sphereGeometry args={[0.1, 16, 16]} />
+            <meshStandardMaterial color={color} emissive="red" emissiveIntensity={0.5} />
+        </mesh>
+    );
+}
 
 const TunnelSegment: React.FC<{ start: Vector3; end: Vector3 }> = ({ start, end }) => {
     const midPoint = new Vector3().addVectors(start, end).multiplyScalar(0.5);
@@ -53,11 +68,10 @@ const TunnelSegment: React.FC<{ start: Vector3; end: Vector3 }> = ({ start, end 
     return (
         <mesh position={midPoint}>
             <boxGeometry args={[0.5, 0.5, length]} />
-            <meshStandardMaterial color="gray" transparent opacity={0.3} />
+            <meshStandardMaterial color="red" transparent opacity={0.5} />
         </mesh>
     );
 };
-
 
 // Componente mejorado para crear una conexión 3D entre sensores con orientación correcta
 const Connection3DAdvanced: React.FC<{ startPos: [number, number, number]; endPos: [number, number, number]; color?: string }> = ({
@@ -98,13 +112,15 @@ const Connection3DAdvanced: React.FC<{ startPos: [number, number, number]; endPo
 
     return (
         <mesh ref={meshRef} position={midPoint}>
-            <cylinderGeometry args={[0.1, 0.1, length, 8]} />
+            <cylinderGeometry args={[0.05, 0.05, length, 8]} />
             <meshStandardMaterial
                 color={color}
                 metalness={0.8}
                 roughness={0.2}
                 emissive={color}
                 emissiveIntensity={0.2}
+                transparent
+                opacity={0.1}
             />
         </mesh>
     );
@@ -187,7 +203,7 @@ const Scene: React.FC = () => {
 
                         return (
                             <group key={`${sensor.id}-${connId}`}>
-                                {isSameZone && sensor.zone === "tunel" && <TunnelSegment start={start} end={end} />}
+                                {/* {isSameZone && sensor.zone === "tunel" && <TunnelSegment start={start} end={end} />} */}
                                 {/* {isSameZone && sensor.zone === "extraction" && (
                                     <Box args={[2, 2, 2]} position={[(sensor.position[0] + endSensor.position[0]) / 2, (sensor.position[1] + endSensor.position[1]) / 2, (sensor.position[2] + endSensor.position[2]) / 2]}>
                                         <meshStandardMaterial color="orange" transparent opacity={0.3} />
@@ -196,7 +212,7 @@ const Scene: React.FC = () => {
                                 {sensor.zone === "bocamina" && (
                                     <group>
                                         <mesh position={start}>
-                                            <sphereGeometry args={[0.5, 16, 16]} />
+                                            <sphereGeometry args={[0.2, 16, 16]} />
                                             <meshStandardMaterial color="blue" transparent opacity={0.4} />
                                         </mesh>
                                         <Text position={[start.x, start.y + 0.7, start.z]} fontSize={0.3} color="white">{sensor.label}</Text>
@@ -205,7 +221,7 @@ const Scene: React.FC = () => {
                                 {sensor.zone === "extraction" && (
                                     <group>
                                         <mesh position={start}>
-                                            <sphereGeometry args={[0.5, 16, 16]} />
+                                            <sphereGeometry args={[0.2, 16, 16]} />
                                             <meshStandardMaterial color="orange" transparent opacity={0.4} />
                                         </mesh>
                                         {/* <Text position={[start.x, start.y + 0.7, start.z]} fontSize={0.3} color="white">{sensor.label}</Text> */}
@@ -218,7 +234,7 @@ const Scene: React.FC = () => {
 
                 {/* Renderizar los sensores */}
                 {sensorsData.map((sensor) => (
-                    <Sensor key={sensor.id} position={sensor.position} onClick={() => setSelectedSensor(sensor)} />
+                    <Sensor key={sensor.id} position={sensor.position} zone={sensor.zone} onClick={() => setSelectedSensor(sensor)} />
                 ))}
 
                 <OrbitControls
