@@ -11,12 +11,10 @@ export const useMineNodes3D = (minaId: string) => {
   const [error, setError] = useState<string | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
 
-  // Memoiza la URL del WebSocket para evitar recreaciones innecesarias
   const wsUrl = useMemo(() => {
     return `$"ws://${MINES_API_HOST}"/ws/minas/${minaId}`;
   }, [minaId]);
 
-  // Función para obtener los nodos 3D utilizando Axios
   const fetchNodes3D = useCallback(async () => {
     try {
       setLoading(true);
@@ -36,7 +34,6 @@ export const useMineNodes3D = (minaId: string) => {
     }
   }, [minaId]);
 
-  // Función para procesar mensajes recibidos por WebSocket
   const handleWebSocketMessage = useCallback((event: MessageEvent) => {
     try {
       const data = JSON.parse(event.data);
@@ -46,24 +43,19 @@ export const useMineNodes3D = (minaId: string) => {
     }
   }, []);
 
-  // Función para manejar errores de WebSocket
   const handleWebSocketError = useCallback((error: Event) => {
     console.error("WebSocket error:", error);
     setError("Error en la conexión WebSocket");
   }, []);
 
-  // Función para conectar WebSocket para datos en tiempo real
   const connectWebSocket = useCallback(() => {
-    // Cerrar conexión existente si la hay
     if (socketRef.current) {
       socketRef.current.close();
     }
 
-    // Crear nueva conexión
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 
-    // Manejadores de eventos del WebSocket
     socket.onopen = () => {
       console.log(`WebSocket connected for mina ${minaId}`);
     };
@@ -73,7 +65,6 @@ export const useMineNodes3D = (minaId: string) => {
 
     socket.onclose = (event) => {
       console.log(`WebSocket connection closed: ${event.code} ${event.reason}`);
-      // Reconectar después de un tiempo si la conexión se cierra inesperadamente
       setTimeout(() => {
         if (socketRef.current?.readyState === WebSocket.CLOSED) {
           connectWebSocket();
@@ -82,13 +73,11 @@ export const useMineNodes3D = (minaId: string) => {
     };
   }, [minaId, wsUrl, handleWebSocketMessage, handleWebSocketError]);
 
-  // Cargar datos iniciales y configurar WebSocket
   useEffect(() => {
     if (minaId) {
       fetchNodes3D();
       connectWebSocket();
 
-      // Limpiar conexión al desmontar
       return () => {
         if (
           socketRef.current &&
@@ -100,7 +89,6 @@ export const useMineNodes3D = (minaId: string) => {
     }
   }, [minaId, fetchNodes3D, connectWebSocket]);
 
-  // Memoiza el objeto de retorno para evitar recreaciones innecesarias
   const returnValue = useMemo(
     () => ({
       nodes3D,
