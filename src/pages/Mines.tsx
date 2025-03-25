@@ -1,9 +1,10 @@
+import { MinesTable } from "../components/MinesTable";
 import Dashboard from "../layouts/Dashboard";
 
 function Mines() {
   return (
-    <Dashboard>
-      <h1>Mines page</h1>
+    <Dashboard pageName="Minas">
+      <MinesTable />
     </Dashboard>
   );
 }
