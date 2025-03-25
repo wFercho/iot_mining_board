@@ -1,5 +1,6 @@
 import React from "react";
-import { Menu, Bell, User } from "lucide-react"; // Import necessary icons from Lucide
+import { Menu, Bell, User, Sun, Moon } from "lucide-react"; // Import necessary icons from Lucide
+import { useAppContext } from "../state/appContext";
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -7,6 +8,8 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, pageName }) => {
+  const { isDarkMode, toggleTheme } = useAppContext();
+
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center w-full">
       <button
@@ -32,6 +35,13 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, pageName }) => {
           aria-label="User  Profile"
         >
           <User size={24} />
+        </button>
+        <button
+          className="p-2 text-gray-600 hover:bg-gray-200 rounded transition duration-200 cursor-pointer"
+          aria-label="User  Profile"
+          onClick={toggleTheme}
+        >
+          {isDarkMode ? <Moon size={24} /> : <Sun size={24} />}
         </button>
       </div>
     </nav>

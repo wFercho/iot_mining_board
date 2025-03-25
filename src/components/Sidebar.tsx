@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -14,6 +13,7 @@ import {
   Gauge,
 } from "lucide-react"; // Asegúrate de tener lucide-react instalado
 import { Link } from "wouter";
+import { useAppContext } from "../state/appContext";
 const moreSidebarElements: { name: string; href: string }[] = [
   {
     name: "Alarmas",
@@ -41,11 +41,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
-  const [isDevicesOpen, setIsDevicesOpen] = useState(false); // Estado para controlar el submenú
-
-  const toggleDevices = () => {
-    setIsDevicesOpen(!isDevicesOpen); // Alternar la visibilidad del submenú
-  };
+  const { isDevicesSidebarOpen, toggleDivecesSidebar } = useAppContext();
 
   return (
     <aside
@@ -66,16 +62,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         {/* Elemento "Dispositivos" con submenú */}
         <li
           className="flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer transition duration-200"
-          onClick={toggleDevices}
+          onClick={toggleDivecesSidebar}
         >
           <div className="flex items-center">
             <Layers size={20} className="mr-2" /> {/* Ícono de Dispositivos */}
             <span>Dispositivos</span>
           </div>
-          {isDevicesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}{" "}
+          {isDevicesSidebarOpen ? (
+            <ChevronUp size={16} />
+          ) : (
+            <ChevronDown size={16} />
+          )}{" "}
           {/* Ícono que cambia */}
         </li>
-        {isDevicesOpen && ( // Mostrar el submenú si isDevicesOpen es true
+        {isDevicesSidebarOpen && ( // Mostrar el submenú si isDevicesOpen es true
           <ul className="ml-4 mt-2">
             <Link href="/iot-gateway">
               <li className="flex items-center p-2 hover:bg-gray-600 rounded cursor-pointer transition duration-200">
@@ -100,11 +100,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         )}
         {/* Otros elementos */}
         {moreSidebarElements.map((item) => (
-          <Link href={item.href}>
-            <li
-              key={item.name}
-              className="flex items-center p-2 hover:bg-gray-700 rounded cursor-pointer transition duration-200"
-            >
+          <Link href={item.href} key={"sidebar" + item.name}>
+            <li className="flex items-center p-2 hover:bg-gray-700 rounded cursor-pointer transition duration-200">
               {item.name === "Alarmas" && (
                 <AlertCircle size={20} className="mr-2" />
               )}{" "}
