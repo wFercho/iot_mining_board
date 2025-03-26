@@ -3,7 +3,7 @@ import axios from "axios";
 import { MineNodes3D, INodeRealTimeData } from "../interfaces/main";
 
 const MINES_API_HOST = "localhost:8080";
-export const useMineNodes3D = (minaId: string) => {
+export const useMineNodes3D = (minaId: string | undefined) => {
   const [nodes3D, setNodes3D] = useState<MineNodes3D>();
   const [nodesRealTimeData, setNodesRealTimeData] =
     useState<INodeRealTimeData[]>();
@@ -12,10 +12,12 @@ export const useMineNodes3D = (minaId: string) => {
   const socketRef = useRef<WebSocket | null>(null);
 
   const wsUrl = useMemo(() => {
+    if (!minaId) return;
     return `$"ws://${MINES_API_HOST}"/ws/minas/${minaId}`;
   }, [minaId]);
 
   const fetchNodes3D = useCallback(async () => {
+    if (!minaId) return;
     try {
       setLoading(true);
       setError(null);
@@ -49,6 +51,7 @@ export const useMineNodes3D = (minaId: string) => {
   }, []);
 
   const connectWebSocket = useCallback(() => {
+    if (!wsUrl) return;
     if (socketRef.current) {
       socketRef.current.close();
     }

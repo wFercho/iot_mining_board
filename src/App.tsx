@@ -1,12 +1,12 @@
 import { Route, Switch } from "wouter";
 import "./App.css";
-import Screen from "./components/Screen";
 import Mines from "./pages/Mines";
 import IoTGateway from "./pages/IoTGateway";
 import Sensors from "./pages/Sensors";
 import Nodes from "./pages/Nodes";
 import Home from "./pages/Home";
 import { AppProvider } from "./state/appContext";
+import Scene from "./components/Mine3D/Scene";
 function App() {
   return (
     <AppProvider>
@@ -18,7 +18,7 @@ function App() {
           <Route path="/iot-gateway" component={IoTGateway} />
           <Route path="/nodes" component={Nodes} />
           <Route path="/sensors" component={Sensors} />
-          <Route path="/mine-nodes-3d/:mine_id" component={Screen} />
+          <Route path="/mine-nodes-3d/:mine_id" component={Scene} />
 
           <Route path="/users/:name">
             {(params) => <>Hello, {params.name}!</>}
