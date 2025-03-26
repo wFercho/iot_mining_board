@@ -37,7 +37,7 @@ export const useMines = (initialParams: MineQueryParams = {}) => {
 
     try {
       const response = await axios.get<MinesResponse>(
-        `${MINES_API_HOST}/mines`,
+        `http://${MINES_API_HOST}/mines`,
         {
           params: queryParams,
         }
