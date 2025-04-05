@@ -41,7 +41,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar, pageName }) => {
           aria-label="User  Profile"
           onClick={toggleTheme}
         >
-          {isDarkMode ? <Moon size={24} /> : <Sun size={24} />}
+          {!isDarkMode ? <Moon size={24} /> : <Sun size={24} />}
         </button>
       </div>
     </nav>
