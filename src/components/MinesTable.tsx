@@ -33,7 +33,7 @@ const MinesTable = () => {
           </tr>
         </thead>
         <tbody>
-          {mines.map(({ id, name, companyName, department, city }) => (
+          {mines.map(({ id, name, company_name, department, city }) => (
             <tr
               key={id}
               className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200"
@@ -44,7 +44,7 @@ const MinesTable = () => {
               >
                 {name}
               </th>
-              <td className="px-6 py-4">{companyName}</td>
+              <td className="px-6 py-4">{company_name}</td>
               <td className="px-6 py-4">{department}</td>
               <td className="px-6 py-4">{city}</td>
               <td className="px-6 py-4">
