@@ -6,7 +6,7 @@ export interface GPSCoordinates {
 export interface Mine {
   id: string;
   name: string;
-  companyName: string;
+  company_name: string;
   coordinates: GPSCoordinates;
   city: string;
   department: string;
