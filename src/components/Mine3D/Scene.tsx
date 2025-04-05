@@ -15,10 +15,23 @@ const Scene = () => {
   const { isDarkMode } = useAppContext();
   const [selectedNode, setSelectedNode] = useState<INodeIn3D | null>(null);
   const orbitControlsRef = useRef<any>(null);
-  const initialCameraPosition = useMemo(() => new Vector3(13, 13, 13), []);
-  const { nodes3D, loading } = useMineNodes3D(mine_id);
+  const initialCameraPosition = useMemo(() => new Vector3(4, 4, 4), []);
+  const { nodes3D, loading, error, wsConnected } = useMineNodes3D(mine_id);
   const nodes3dData = nodes3D?.nodes;
   const canvaContainerRef = useRef<HTMLDivElement>(null);
+
+  // Efecto para mantener actualizado el nodo seleccionado cuando cambian los datos
+  useEffect(() => {
+    if (selectedNode && nodes3dData) {
+      // Buscar el nodo seleccionado actualizado en los nuevos datos
+      const updatedNode = nodes3dData.find(
+        (node) => node.id === selectedNode.id
+      );
+      if (updatedNode) {
+        setSelectedNode(updatedNode);
+      }
+    }
+  }, [nodes3D, selectedNode]);
 
   useEffect(() => {
     if (orbitControlsRef.current) {
@@ -42,6 +55,25 @@ const Scene = () => {
 
   return (
     <Dashboard pageName="Nodos sensores en mina">
+      <div className="w-full px-4 py-2 flex justify-between items-center bg-gray-100 dark:bg-gray-800">
+        <div className="flex items-center">
+          <div
+            className={`h-3 w-3 rounded-full mr-2 ${
+              wsConnected ? "bg-green-500" : "bg-red-500"
+            }`}
+          ></div>
+          <span className="text-sm">
+            {wsConnected ? "Conectado" : "Desconectado"} - WebSocket
+          </span>
+        </div>
+      </div>
+
+      {error && (
+        <div className="w-full p-2 bg-red-100 border-l-4 border-red-500 text-red-700 mb-4">
+          <p>{error}</p>
+        </div>
+      )}
+
       <div
         className="dark:bg-black bg-gray-50 h-full w-[99%] relative"
         ref={canvaContainerRef}
@@ -61,7 +93,7 @@ const Scene = () => {
           }}
         >
           <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} intensity={1} />
+          <pointLight position={[5, 5, 5]} intensity={1} />
 
           {/* Renderizar conexiones 3D entre sensores */}
           {nodes3dData.map((node) =>
@@ -87,11 +119,11 @@ const Scene = () => {
           )}
 
           {/* Renderizar nodos con sus categorías */}
-          {nodes3dData.map((sensor) => (
+          {nodes3dData.map((node) => (
             <NodeVisualization
-              key={sensor.id}
-              sensor={sensor}
-              onClick={() => setSelectedNode(sensor)}
+              key={node.id}
+              node={node}
+              onClick={() => setSelectedNode(node)}
               isDarkMode={isDarkMode}
             />
           ))}
