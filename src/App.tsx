@@ -7,6 +7,7 @@ import Nodes from "./pages/Nodes";
 import Home from "./pages/Home";
 import { AppProvider } from "./state/appContext";
 import Scene from "./components/Mine3D/Scene";
+import NewMine from "./pages/NewMine";
 function App() {
   return (
     <AppProvider>
@@ -15,6 +16,7 @@ function App() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/mines" component={Mines} />
+          <Route path="/mines/new" component={NewMine} />
           <Route path="/iot-gateway" component={IoTGateway} />
           <Route path="/nodes" component={Nodes} />
           <Route path="/sensors" component={Sensors} />
