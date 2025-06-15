@@ -1,9 +1,14 @@
 import "./App.css";
-import Screen from "./components/Screen";
+import { BrowserRouter } from "react-router-dom";
+import Dashboard from './components/Dashboard';
+import { AppRouter } from "./components/Router";
 function App() {
   return (
     <div className="h-full bg-black">
-      <Screen mineId="ca90309e-8f17-49aa-80d9-e2ebc47e83f3" />
+      <BrowserRouter>
+        <AppRouter /> {/* Renderiza el router principal */}
+      </BrowserRouter>
+    
     </div>
   );
 }

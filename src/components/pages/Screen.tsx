@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Billboard, OrbitControls, Text } from "@react-three/drei";
 import { Matrix4, Mesh, Vector3 } from "three";
-import { useMineNodes3D } from "../hooks/useMineNodes3D";
-import { INodeIn3D, ZoneCategory } from "../interfaces/main";
+import { useMineNodes3D } from "../../hooks/useMineNodes3D";
+import { INodeIn3D, ZoneCategory } from "../../interfaces/main";
 
 interface SensorProps {
   position: [number, number, number];
@@ -11,7 +11,7 @@ interface SensorProps {
   category: string;
 }
 
-const Sensor: React.FC<SensorProps> = ({ position, onClick, category }) => {
+export const Sensor: React.FC<SensorProps> = ({ position, onClick, category }) => {
   const getColorByCategory = (category: string) => {
     switch (category) {
       case "bocamina":
@@ -100,7 +100,7 @@ const Connection3DAdvanced: React.FC<{
   );
 };
 
-const Scene: React.FC<{ mineId: string }> = ({ mineId }) => {
+export const Scene: React.FC<{ mineId: string }> = ({ mineId }) => {
   const [selectedNode, setSelectedNode] = useState<INodeIn3D | null>(null);
   const orbitControlsRef = useRef<any>(null);
   const initialCameraPosition = useMemo(() => new Vector3(13, 13, 13), []);
@@ -274,4 +274,3 @@ const Scene: React.FC<{ mineId: string }> = ({ mineId }) => {
   );
 };
 
-export default Scene;

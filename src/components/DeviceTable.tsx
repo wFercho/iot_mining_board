@@ -4,7 +4,7 @@ const WS_URL = "ws://localhost:8000/ws";
 
 export default function DeviceTable() {
     const [isConnected, setIsConnected] = useState(false);
-    const [messages, setMessages] = useState<string[]>([]); // Estado para almacenar los datos recibidos
+    const [messages, setMessages] = useState<{ sensor_id: number; temperature?: number; humidity?: number }[]>([]);
     const ws = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -19,19 +19,32 @@ export default function DeviceTable() {
                 console.log("✅ Conexión WebSocket abierta");
                 setIsConnected(true);
 
-                // 🔹 Enviar un mensaje cada 30 segundos para mantener la conexión activa
                 const keepAliveInterval = setInterval(() => {
                     if (ws.current?.readyState === WebSocket.OPEN) {
-                        ws.current.send("ping");
+                        ws.current?.send("ping");
                     }
                 }, 30000);
 
-                ws.current.onclose = () => clearInterval(keepAliveInterval);
+                if (ws.current) {
+                    ws.current.onclose = () => clearInterval(keepAliveInterval);
+                }
+                
             };
 
             ws.current.onmessage = (event) => {
                 console.log("📩 Mensaje recibido:", event.data);
-                setMessages(prev => [...prev, event.data]); // Guardar cada mensaje recibido en el estado
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    // Validar que los datos sean correctos antes de agregarlos
+                    if (typeof data.sensor_id === "number" && typeof data.temperature === "number" && typeof data.humidity === "number") {
+                        setMessages(prev => [...prev, data]);
+                    } else {
+                        console.warn("⚠️ Datos inválidos recibidos:", data);
+                    }
+                } catch (error) {
+                    console.error("❌ Error al analizar JSON:", error);
+                }
             };
 
             ws.current.onclose = (event) => {
@@ -61,23 +74,30 @@ export default function DeviceTable() {
                 {isConnected ? "🟢 Conectado" : "🔴 Desconectado"}
             </h2>
 
-            {/* Tabla de datos recibidos */}
-            <table className="w-full border-collapse border border-gray-300 mt-4">
-                <thead>
-                    <tr className="bg-gray-200">
-                        <th className="border border-gray-300 px-4 py-2">#</th>
-                        <th className="border border-gray-300 px-4 py-2">Mensaje</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {messages.map((msg, index) => (
-                        <tr key={index} className="border border-gray-300">
-                            <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
-                            <td className="border border-gray-300 px-4 py-2">{msg}</td>
+            <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-300 mt-4">
+                    <thead>
+                        <tr className="bg-gray-800 text-white">
+                            <th className="border border-gray-600 px-4 py-2">Sensor ID</th>
+                            <th className="border border-gray-600 px-4 py-2">Temperatura (°C)</th>
+                            <th className="border border-gray-600 px-4 py-2">Humedad (%)</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {messages.map((msg, index) => (
+                            <tr key={index} className="border border-gray-300 text-center">
+                                <td className="border border-gray-300 px-4 py-2">{msg.sensor_id}</td>
+                                <td className="border border-gray-300 px-4 py-2">
+                                    {msg.temperature !== undefined ? msg.temperature.toFixed(2) : "N/A"}
+                                </td>
+                                <td className="border border-gray-300 px-4 py-2">
+                                    {msg.humidity !== undefined ? msg.humidity.toFixed(2) : "N/A"}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

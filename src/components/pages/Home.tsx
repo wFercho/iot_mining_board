@@ -1,7 +1,7 @@
 import React from "react";
-import SensorData from "@/components/DeviceTable"; // Asegúrate de que la ruta sea correcta
+import SensorData from "../DeviceTable"; // Adjusted the path to match the relative location
 
-const Home: React.FC = () => {
+export const Home: React.FC = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Datos del Sensor</h1>
@@ -10,4 +10,3 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;

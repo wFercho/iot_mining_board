@@ -1,58 +1,95 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp, Home, Settings, AlertCircle, Grid, User, Layers, Pickaxe, BookMinus, OctagonMinus } from "lucide-react"; // Asegúrate de tener lucide-react instalado
+import { ChevronDown, ChevronUp, Home, Settings, AlertCircle, Grid, User, Layers, Pickaxe, BookMinus, OctagonMinus, Axis3D } from "lucide-react";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
   isOpen: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
-  const [isDevicesOpen, setIsDevicesOpen] = useState(false); // Estado para controlar el submenú
+  const navigate = useNavigate();
+  const location = useLocation(); // Hook para obtener la ruta actual
+  const [isDevicesOpen, setIsDevicesOpen] = useState(false);
 
   const toggleDevices = () => {
-    setIsDevicesOpen(!isDevicesOpen); // Alternar la visibilidad del submenú
+    setIsDevicesOpen(!isDevicesOpen);
   };
+
+  // Función para determinar si un ítem está activo
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  const menuItems = [
+    { name: "3D", icon: <Axis3D size={20} className="mr-2" />, path: "/screen" },
+    { name: "Alarmas", icon: <AlertCircle size={20} className="mr-2" />, path: "/alarmas" },
+    { name: "Tableros", icon: <Grid size={20} className="mr-2" />, path: "/tableros" },
+    { name: "Perfiles", icon: <User size={20} className="mr-2" />, path: "/perfiles" },
+    { name: "Configuración", icon: <Settings size={20} className="mr-2" />, path: "/configuracion" },
+  ];
 
   return (
     <aside className={`bg-gray-800 text-white w-64 p-4 ${isOpen ? "block" : "hidden"}`}>
       <h2 className="text-xl font-bold">Nombre</h2>
       <ul className="mt-4">
         {/* Elemento "Inicio" */}
-        <li className="flex items-center p-2 hover:bg-gray-700 rounded cursor-pointer transition duration-200">
-          <Home size={20} className="mr-2" /> {/* Ícono de Inicio */}
+        <li 
+          className={`flex items-center p-2 rounded cursor-pointer transition duration-200 ${
+            isActive("/home") ? "bg-gray-700" : "hover:bg-gray-700"
+          }`}
+          onClick={() => navigate("/home")}
+        > 
+          <Home size={20} className="mr-2" /> 
           <span>Inicio</span>
         </li>
+
         {/* Elemento "Dispositivos" con submenú */}
-        <li className="flex items-center justify-between p-2 hover:bg-gray-700 rounded cursor-pointer transition duration-200" onClick={toggleDevices}>
+        <li 
+          className={`flex items-center justify-between p-2 rounded cursor-pointer transition duration-200 ${
+            location.pathname.startsWith("/sensores") ? "bg-gray-700" : "hover:bg-gray-700"
+          }`}
+          onClick={toggleDevices}
+        >
           <div className="flex items-center">
-            <Layers size={20} className="mr-2" /> {/* Ícono de Dispositivos */}
+            <Layers size={20} className="mr-2" />
             <span>Dispositivos</span>
           </div>
-          {isDevicesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />} {/* Ícono que cambia */}
+          {isDevicesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </li>
-        {isDevicesOpen && ( // Mostrar el submenú si isDevicesOpen es true
+
+        {isDevicesOpen && (
           <ul className="ml-4 mt-2">
-            <li className="flex items-center p-2 hover:bg-gray-600 rounded cursor-pointer transition duration-200">
-              <Pickaxe size={20} className="mr-2" /> {/* Ícono de Minas */}
+            <li 
+              className={`flex items-center p-2 rounded cursor-pointer transition duration-200 ${
+                isActive("/sensores") ? "bg-gray-600" : "hover:bg-gray-600"
+              }`}
+              onClick={() => navigate("/sensores")}
+            >
+              <Pickaxe size={20} className="mr-2" />
               <span>Minas</span>
             </li>
             <li className="flex items-center p-2 hover:bg-gray-600 rounded cursor-pointer transition duration-200">
-              <BookMinus size={20} className="mr-2" /> {/* Ícono de Nodos Sensores */}
+              <BookMinus size={20} className="mr-2" />
               <span>Nodos Sensores</span>
             </li>
             <li className="flex items-center p-2 hover:bg-gray-600 rounded cursor-pointer transition duration-200">
-              <OctagonMinus size={20} className="mr-2" /> {/* Ícono de Sensores */}
+              <OctagonMinus size={20} className="mr-2" />
               <span>Sensores</span>
             </li>
           </ul>
         )}
+
         {/* Otros elementos */}
-        {["Alarmas", "Tableros", "Perfiles", "Configuración"].map((item) => (
-          <li key={item} className="flex items-center p-2 hover:bg-gray-700 rounded cursor-pointer transition duration-200">
-            {item === "Alarmas" && <AlertCircle size={20} className="mr-2" />} {/* Ícono de Alarmas */}
-            {item === "Tableros" && <Grid size={20} className="mr-2" />} {/* Ícono de Tableros */}
-            {item === "Perfiles" && <User  size={20} className="mr-2" />} {/* Ícono de Perfiles */}
-            {item === "Configuración" && <Settings size={20} className="mr-2" />} {/* Ícono de Configuración */}
-            <span>{item}</span>
+        {menuItems.map((item) => (
+          <li
+            key={item.name}
+            className={`flex items-center p-2 rounded cursor-pointer transition duration-200 ${
+              isActive(item.path) ? "bg-gray-700" : "hover:bg-gray-700"
+            }`}
+            onClick={() => navigate(item.path)}
+          >
+            {item.icon}
+            <span>{item.name}</span>
           </li>
         ))}
       </ul>
