@@ -6,7 +6,7 @@ export interface Sensor {
   id: string;
   variable: string;
   marca: string;
-  referencia: string;
+  referencia: number;
   id_node: string;
   unidad_medicion: string;
   max_medicion: number;
@@ -75,6 +75,16 @@ export const SensorService = {
     } catch (error) {
       console.error('Error fetching sensor:', error);
       throw new Error('Error fetching sensor');
+    }
+  },
+
+  async getIdsSensors(): Promise<string[]> {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/sensor-nodes/ids`);
+      return response.data.node_ids;
+    } catch (error) {
+      console.error('Error fetching sensor IDs:', error);
+      throw new Error('Error fetching sensor IDs');
     }
   },
 

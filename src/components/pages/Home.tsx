@@ -4,7 +4,7 @@ import SensorData from "../DeviceTable"; // Adjusted the path to match the relat
 export const Home: React.FC = () => {
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Datos del Sensor</h1>
+      <h1 className="text-2xl font-bold mb-4">Datos de Sensores</h1>
       <SensorData />
     </div>
   );
