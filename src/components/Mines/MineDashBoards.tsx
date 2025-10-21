@@ -1,8 +1,8 @@
 // components/MineDashboard.tsx
 import { useState, useEffect } from 'react';
-import { 
-  Building, 
-  Router, 
+import {
+  Building,
+  Router,
   Activity,
   Plus,
   ArrowLeft,
@@ -91,8 +91,11 @@ export const MineDashboard = () => {
     setView('list');
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
@@ -106,7 +109,7 @@ export const MineDashboard = () => {
             {view === 'list' && (
               <button
                 onClick={handleCreate}
-                className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg hover:from-indigo-700 hover:to-blue-700 flex items-center space-x-2 shadow-lg transform hover:scale-105 transition-all duration-200"
+                className="px-6 py-3 bg-gradient-to-r cursor-pointer from-indigo-600 to-blue-600 text-white rounded-lg hover:from-indigo-700 hover:to-blue-700 flex items-center space-x-2 shadow-lg transform hover:scale-105 transition-all duration-200"
               >
                 <Plus className="w-5 h-5" />
                 <span className="font-medium">Nueva Mina</span>
@@ -115,7 +118,7 @@ export const MineDashboard = () => {
             {view !== 'list' && (
               <button
                 onClick={() => setView('list')}
-                className="px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 flex items-center space-x-2 shadow-lg transform hover:scale-105 transition-all duration-200"
+                className="px-6 py-3 bg-gradient-to-r cursor-pointer from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 flex items-center space-x-2 shadow-lg transform hover:scale-105 transition-all duration-200"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span className="font-medium">Volver al Listado</span>
@@ -224,43 +227,19 @@ export const MineDashboard = () => {
             {/* Tabla de Minas */}
             <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
               {/* Table Header */}
-            
+
 
               <MineTable
                 mines={mines}
                 onEdit={handleEdit}
                 onView={handleView}
                 onDelete={handleDelete}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
               />
-              
-              {/* Paginación */}
-              <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                <div className="flex justify-between items-center">
-                  <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors duration-200 font-medium text-gray-700"
-                  >
-                    ← Anterior
-                  </button>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-600 font-medium">
-                      Página {currentPage} de {totalPages}
-                    </span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-500 text-sm">
-                      Total: {mines.length} minas
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors duration-200 font-medium text-gray-700"
-                  >
-                    Siguiente →
-                  </button>
-                </div>
-              </div>
+
+
             </div>
           </>
         ) : view === 'form' ? (
@@ -287,7 +266,7 @@ export const MineDashboard = () => {
               <h2 className="text-white font-bold text-lg">Detalles de la Mina</h2>
               <p className="text-indigo-100 text-sm">Información completa y dispositivos asociados</p>
             </div>
-            <MineDetailView 
+            <MineDetailView
               mine={selectedMine}
               onBack={() => setView('list')}
               onEdit={() => handleEdit(selectedMine)}

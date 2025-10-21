@@ -1,7 +1,6 @@
 // src/routes/AppRouter.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Scene } from "./pages/Screen";
-import Dashboard from "./Dashboard";
 import { SensorPage } from "./pages/Sensor";
 import { SensorNodesPage } from "./pages/SensorNodes";
 import { Boards } from "./pages/Boards";
@@ -9,6 +8,7 @@ import { Config } from "./pages/Config";
 import { MinesPage } from "./pages/Mines";
 import { ProfilesPage } from "./pages/Profiles";
 import { IotGatewaysPage } from "./pages/IoTGateways";
+import { Home } from "./pages/Home";
 /* import { PrivateRoute } from "./PrivateRoute";
  */
 export const AppRouter = () => {
@@ -16,7 +16,7 @@ export const AppRouter = () => {
     <Routes>
 
         <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route path="/home" element={<Dashboard />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/screen" element={<Scene mineId=""/>} />
         <Route path="/sensores" element={<SensorPage/>} />
         <Route path="/nodos_sensores" element={<SensorNodesPage/>} />

@@ -69,7 +69,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
         {/* Botón de tema - SÚPER SIMPLE */}
         <button
           onClick={toggleTheme}
-          className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-200"
+          className="p-2 text-gray-600 cursor-pointer dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-200"
           aria-label={isDarkMode ? "Cambiar a tema claro" : "Cambiar a tema oscuro"}
         >
           {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
@@ -78,7 +78,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
         {/* Notificaciones */}
         <div className="relative">
           <button
-            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-200 relative"
+            className="p-2 text-gray-600 cursor-pointer dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-200 relative"
             aria-label="Notifications"
             onClick={() => {
               setShowNotifications(!showNotifications);
@@ -105,7 +105,7 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllAsRead}
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-200"
+                    className="text-xs cursor-pointer text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-200"
                   >
                     Marcar todas como leídas
                   </button>

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { IoTGateway } from '../../interfaces/IoTGateways';
 import { Cpu, Radio, Edit, Eye, Trash2 } from 'lucide-react';
+import PaginationControls from '../PaginationControls';
 
 interface IoTGatewayTableProps {
     gateways: IoTGateway[];
@@ -10,13 +11,13 @@ interface IoTGatewayTableProps {
     onView: (gateway: IoTGateway) => void;
     currentPage?: number;
     totalPages?: number;
-    onPageChange?: (page: number) => void;
+    onPageChange: (page: number) => void;
 }
 
-export const IoTGatewayTable = ({ 
-    gateways, 
-    onEdit, 
-    onView, 
+export const IoTGatewayTable = ({
+    gateways,
+    onEdit,
+    onView,
     onDelete,
     currentPage = 1,
     totalPages = 1,
@@ -26,7 +27,7 @@ export const IoTGatewayTable = ({
     const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const countTotalSensors = (gateway: IoTGateway): number => {
-        return gateway.sensor_nodes.reduce((total, node) => 
+        return gateway.sensor_nodes.reduce((total, node) =>
             total + (node.sensors?.length ?? 0), 0
         );
     };
@@ -39,17 +40,7 @@ export const IoTGatewayTable = ({
         }, 300);
     };
 
-    const handlePrevPage = () => {
-        if (onPageChange && currentPage > 1) {
-            onPageChange(currentPage - 1);
-        }
-    };
 
-    const handleNextPage = () => {
-        if (onPageChange && currentPage < totalPages) {
-            onPageChange(currentPage + 1);
-        }
-    };
 
     return (
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
@@ -102,17 +93,15 @@ export const IoTGatewayTable = ({
                             </tr>
                         ) : (
                             gateways.map((gateway) => (
-                                <tr 
-                                    key={gateway.id} 
-                                    className={`transition-all duration-200 ${
-                                        hoveredRow === gateway.id 
-                                            ? 'bg-purple-50 scale-[1.01]' 
+                                <tr
+                                    key={gateway.id}
+                                    className={`transition-all duration-200 ${hoveredRow === gateway.id
+                                            ? 'bg-purple-50 scale-[1.01]'
                                             : 'hover:bg-purple-50'
-                                    } ${
-                                        deletingId === gateway.id 
-                                            ? 'opacity-50 scale-95' 
+                                        } ${deletingId === gateway.id
+                                            ? 'opacity-50 scale-95'
                                             : ''
-                                    }`}
+                                        }`}
                                     onMouseEnter={() => setHoveredRow(gateway.id)}
                                     onMouseLeave={() => setHoveredRow(null)}
                                 >
@@ -190,33 +179,17 @@ export const IoTGatewayTable = ({
                 </table>
             </div>
 
-            {/* Paginación */}
-            {totalPages > 1 && onPageChange && (
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                        <span className="text-sm text-gray-700">
-                            Página <span className="font-semibold">{currentPage}</span> de{' '}
-                            <span className="font-semibold">{totalPages}</span>
-                        </span>
-                    </div>
-                    <div className="flex space-x-2">
-                        <button
-                            onClick={handlePrevPage}
-                            disabled={currentPage === 1}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 hover:shadow-md"
-                        >
-                            Anterior
-                        </button>
-                        <button
-                            onClick={handleNextPage}
-                            disabled={currentPage === totalPages}
-                            className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 hover:shadow-md"
-                        >
-                            Siguiente
-                        </button>
-                    </div>
-                </div>
-            )}
+            <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                variant="bottom"
+            />
+
+            {/* Footer informativo */}
+            <div className="bg-gray-50 px-6 py-3 text-right text-xs text-gray-500">
+                Total de minas: {gateways.length} • Actualizado automáticamente
+            </div>
         </div>
     );
 };

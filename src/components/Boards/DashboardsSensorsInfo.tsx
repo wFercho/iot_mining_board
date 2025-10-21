@@ -250,7 +250,7 @@ export const MiningDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-white p-6">
       {/* Header */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
@@ -286,19 +286,19 @@ export const MiningDashboard: React.FC = () => {
 
       {/* Resumen general */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg p-4 text-center">
+        <div className="bg-white rounded-lg shadow-2xl p-4 text-center">
           <p className="text-2xl font-bold text-blue-600">{mines.length}</p>
           <p className="text-sm text-gray-600">Minas</p>
         </div>
-        <div className="bg-white rounded-lg p-4 text-center">
+        <div className="bg-white rounded-lg shadow-2xl p-4 text-center">
           <p className="text-2xl font-bold text-green-600">{gateways.length}</p>
           <p className="text-sm text-gray-600">Gateways</p>
         </div>
-        <div className="bg-white rounded-lg p-4 text-center">
+        <div className="bg-white rounded-lg shadow-2xl p-4 text-center">
           <p className="text-2xl font-bold text-purple-600">{sensorNodes.length}</p>
           <p className="text-sm text-gray-600">Nodos</p>
         </div>
-        <div className="bg-white rounded-lg p-4 text-center">
+        <div className="bg-white rounded-lg shadow-2xl p-4 text-center">
           <p className="text-2xl font-bold text-orange-600">{sensors.length}</p>
           <p className="text-sm text-gray-600">Sensores</p>
         </div>

@@ -1,15 +1,19 @@
 // components/Tables/SensorNodeTables.tsx
 import { useState } from 'react';
 import { SensorNode } from '../../interfaces/Nodes';
+import PaginationControls from '../PaginationControls';
 
 interface SensorNodeTableProps {
     sensorNodes: SensorNode[];
     onEdit: (sensorNode: SensorNode) => void;
     onDelete: (id: string) => void;
     onView: (sensorNode: SensorNode) => void;
+    totalPages: number;
+    currentPage: number;
+    onPageChange: (page: number) => void;
 }
 
-export const SensorNodeTable = ({ sensorNodes, onEdit, onView, onDelete }: SensorNodeTableProps) => {
+export const SensorNodeTable = ({ sensorNodes, onEdit, onView, onDelete, totalPages, currentPage, onPageChange }: SensorNodeTableProps) => {
     const [hoveredRow, setHoveredRow] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -140,6 +144,13 @@ export const SensorNodeTable = ({ sensorNodes, onEdit, onView, onDelete }: Senso
                     </tbody>
                 </table>
             </div>
+            {/* Paginación */}
+            <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                variant="bottom"
+            />
 
             {/* Footer informativo */}
             <div className="bg-gray-50 px-6 py-3 text-right text-xs text-gray-500">

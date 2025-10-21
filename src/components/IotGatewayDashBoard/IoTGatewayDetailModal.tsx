@@ -1,6 +1,8 @@
 import { Cpu, MapPin, Calendar, Edit, X, Server, Radio, Activity, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { IoTGateway } from '../../interfaces/IoTGateways';
+import { SensorDetailModal } from '../SensorNodes/SensorNodeDetailModa';
+import { Sensor } from '../../interfaces/Sensors';
 
 interface IoTGatewayDetailModalProps {
   gateway: IoTGateway;
@@ -10,8 +12,9 @@ interface IoTGatewayDetailModalProps {
 
 export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDetailModalProps) => {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
-
-  const totalSensors = gateway.sensor_nodes.reduce((total, node) => 
+  const [selectedSensor, setSelectedSensor] = useState<Sensor | null>(null);
+  const [isSensorModalOpen, setIsSensorModalOpen] = useState(false);
+  const totalSensors = gateway.sensor_nodes.reduce((total, node) =>
     total + (node.sensors?.length || 0), 0
   );
 
@@ -25,6 +28,7 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
     setExpandedNodes(newExpanded);
   };
 
+
   const getCategoryColor = (category?: string) => {
     const colors: { [key: string]: string } = {
       'Temperatura': 'bg-red-100 text-red-700 border-red-200',
@@ -36,11 +40,20 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
     return colors[category || ''] || 'bg-gray-100 text-gray-700 border-gray-200';
   };
 
+  const handleSensorClick = (sensor: Sensor) => {
+    setSelectedSensor(sensor);
+    setIsSensorModalOpen(true);
+  };
+
+  const handleCloseSensorModal = () => {
+    setIsSensorModalOpen(false);
+    setSelectedSensor(null);
+  };
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
       <div className="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
         {/* Header con gradiente */}
-        <div className="relative bg-gradient-to-r from-purple-600 via-purple-700 to-blue-600 px-8 py-6">
+        <div className="relative bg-gradient-to-r from-indigo-600 to-blue-600 px-8 py-6">
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative flex justify-between items-start">
             <div className="flex items-center space-x-4">
@@ -59,14 +72,14 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
               </div>
             </div>
             <div className="flex space-x-2">
-              <button 
+              <button
                 onClick={onEdit}
                 className="flex items-center space-x-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl transition-all duration-200 shadow-lg"
               >
                 <Edit className="w-4 h-4" />
                 <span className="font-medium">Editar</span>
               </button>
-              <button 
+              <button
                 onClick={onClose}
                 className="p-2 hover:bg-white/20 rounded-xl transition-all duration-200"
               >
@@ -190,7 +203,7 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
                 {gateway.sensor_nodes.length} nodos activos
               </span>
             </div>
-            
+
             {gateway.sensor_nodes.length > 0 ? (
               <div className="space-y-4">
                 {gateway.sensor_nodes.map((node) => {
@@ -198,11 +211,10 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
                   return (
                     <div key={node.id} className="border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-purple-300 transition-all duration-200">
                       <div
-                        className={`p-5 cursor-pointer transition-all duration-200 ${
-                          isExpanded 
-                            ? 'bg-gradient-to-r from-purple-50 to-blue-50' 
-                            : 'bg-white hover:bg-gray-50'
-                        }`}
+                        className={`p-5 cursor-pointer transition-all duration-200 ${isExpanded
+                          ? 'bg-gradient-to-r from-purple-50 to-blue-50'
+                          : 'bg-white hover:bg-gray-50'
+                          }`}
                         onClick={() => toggleNode(node.id)}
                       >
                         <div className="flex items-center justify-between">
@@ -239,9 +251,8 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
                               <Radio className="w-4 h-4 mr-2" />
                               {node.sensors?.length || 0} sensores
                             </span>
-                            <div className={`p-2 rounded-lg transition-all duration-200 ${
-                              isExpanded ? 'bg-purple-200 rotate-180' : 'bg-gray-200'
-                            }`}>
+                            <div className={`p-2 rounded-lg transition-all duration-200 ${isExpanded ? 'bg-purple-200 rotate-180' : 'bg-gray-200'
+                              }`}>
                               <ChevronDown className={`w-5 h-5 ${isExpanded ? 'text-purple-600' : 'text-gray-600'}`} />
                             </div>
                           </div>
@@ -253,8 +264,8 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
                           {node.sensors && node.sensors.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                               {node.sensors.map((sensor) => (
-                                <div 
-                                  key={sensor.id} 
+                                <div
+                                  key={sensor.id}
                                   className="border border-gray-200 rounded-xl p-4 bg-gradient-to-br from-white to-gray-50 hover:shadow-lg hover:border-purple-300 transition-all duration-200 group cursor-pointer"
                                 >
                                   <div className="flex items-center justify-between mb-3">
@@ -268,12 +279,13 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
                                     </div>
                                     <span className="text-xs font-mono text-gray-500">#{sensor.id}</span>
                                   </div>
-                                  
+
                                   <div className="space-y-2 text-sm">
                                     <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                                       <span className="font-medium text-gray-600">Marca:</span>
                                       <span className="text-gray-900">{sensor.marca}</span>
                                     </div>
+                                    
                                     <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                                       <span className="font-medium text-gray-600">Ref:</span>
                                       <span className="text-gray-900 font-mono">{sensor.referencia}</span>
@@ -290,8 +302,10 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
                                     </div>
                                   </div>
 
-                                  <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
-                                    <span className="text-xs font-medium text-purple-600 group-hover:text-purple-700">
+                                  <div onClick={() => handleSensorClick(sensor)}
+                                    className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
+                                    <span className="text-xs font-medium text-purple-600 group-hover:text-purple-700"
+                                    >
                                       Ver detalles completos
                                     </span>
                                     <svg className="w-4 h-4 text-purple-600 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,6 +339,11 @@ export const IoTGatewayDetailModal = ({ gateway, onClose, onEdit }: IoTGatewayDe
           </div>
         </div>
       </div>
+      <SensorDetailModal
+        sensor={selectedSensor!}
+        isOpen={isSensorModalOpen}
+        onClose={handleCloseSensorModal}
+      />
     </div>
   );
 };

@@ -81,7 +81,6 @@ export const ModulesPage: React.FC = () => {
             // Marcar módulo como aplicado
             setAppliedModules(prev => new Set([...prev, module.id]));
 
-            console.log(`✅ Módulo "${module.name}" aplicado: ${appliedCount} nuevas reglas`);
 
             // Mostrar notificación de éxito
             alert(`✅ Módulo "${module.name}" aplicado exitosamente!\nSe agregaron ${appliedCount} nuevas reglas.`);
@@ -161,7 +160,7 @@ export const ModulesPage: React.FC = () => {
         const isApplying = applyingModule === selectedModule.id;
 
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
+            <div className="min-h-screen bg-white p-6">
                 {/* Header de Detalles */}
                 <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
                     <div className="flex items-center justify-between mb-4">
@@ -335,7 +334,7 @@ export const ModulesPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-white p-6">
             {/* Header */}
             <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
                 <div className="flex items-center justify-between mb-6">

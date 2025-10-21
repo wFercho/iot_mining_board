@@ -75,7 +75,7 @@ export const SensorModal = ({ sensor, onClose }: SensorModalProps) => {
     >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white">
+        <div className="bg-black px-8 py-6 text-white">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-3xl font-bold mb-1">

@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { SensorModal } from "./SensorModal";
 import { useSensorData } from "./hooks/useSensorData";
 import { SensorData } from "../interfaces/Sensors";
+import PaginationControls from "./PaginationControls";
 
 const PAGE_SIZE = 10;
 
@@ -25,8 +26,6 @@ export default function DeviceTable() {
     const {
         getTableData,
         alerts,
-        isConnected,
-        connectionState,
         totalCount,
         okCount,
         criticalAlertsCount,
@@ -38,6 +37,10 @@ export default function DeviceTable() {
     // Obtener datos combinados para la tabla
     const tableData = getTableData();
 
+    // Manejar cambio de página
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     // Ordenar datos
     const sortedData = [...tableData];
@@ -154,12 +157,6 @@ export default function DeviceTable() {
         m.status === 'WARNING' || m.status === 'DANGER' || m.status === 'ERROR'
     );
 
-    console.log("📊 DeviceTable: Estado actual", {
-        totalData: tableData.length,
-        filteredData: filteredData.length,
-        alertsCount: alerts.length,
-        criticalAlerts: criticalAlertsCount
-    });
 
     // Función para mapear estados a español
     const mapStatusToSpanish = (status: string): string => {
@@ -186,149 +183,212 @@ export default function DeviceTable() {
                 />
             )}
 
-            <div className="flex-1 overflow-auto p-4 bg-gray-50">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                        {isConnected ? "🟢 Conectado" : "🔴 Desconectado"}
-                        {connectionState === 'connecting' && " (Conectando...)"}
-                        {connectionState === 'error' && " (Error)"} |
-                        <span className="ml-2 text-sm font-normal text-gray-600">
-                            Mostrando {filteredData.length} registros
-                        </span>
-                    </h2>
+            <div className="flex-1  bg-white container mx-auto px-4 py-8">
+                <div className="bg-white rounded-xl shadow-lg p-6 mb-8 ">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+                                Datos de Sensores
+                            </h1>
+                            <p className="text-gray-600 mt-2">Sistema de monitoreo y gestión integral</p>
 
-                    <div className="flex items-center space-x-4">
-                        <input
-                            type="text"
-                            placeholder="Buscar nodo, tipo o fabricante..."
-                            className="px-3 py-2 border rounded-md text-sm"
-                            value={searchTerm}
-                            onChange={(e) => {
-                                setSearchTerm(e.target.value);
-                                setCurrentPage(1);
-                            }}
-                        />
-
-                        <div className="flex items-center space-x-2">
-                            <button
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                disabled={currentPage === 1}
-                                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                            >
-                                Anterior
-                            </button>
-                            <span className="text-sm">
-                                Página {currentPage} de {totalPages}
-                            </span>
-                            <button
-                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                disabled={currentPage === totalPages || totalPages === 0}
-                                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                            >
-                                Siguiente
-                            </button>
                         </div>
+
+
                     </div>
                 </div>
 
-                {/* Filtros rápidos mejorados */}
-                <div className="mb-4 flex space-x-2 flex-wrap gap-2">
-                    <button
-                        onClick={() => setSearchTerm('')}
-                        className={`px-3 py-1 text-sm rounded transition-colors ${!searchTerm
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 hover:bg-gray-300'
-                            }`}
-                    >
-                        Todos ({totalCount})
-                    </button>
-                    <button
-                        onClick={() => setSearchTerm('status:OK')}
-                        className={`px-3 py-1 text-sm rounded transition-colors ${searchTerm === 'status:OK'
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-200 hover:bg-gray-300'
-                            }`}
-                    >
-                        OK ({okCount})
-                    </button>
-                    <button
-                        onClick={() => setSearchTerm('status:WARNING,DANGER,ERROR')}
-                        className={`px-3 py-1 text-sm rounded transition-colors ${searchTerm === 'status:WARNING,DANGER,ERROR'
-                            ? 'bg-red-500 text-white'
-                            : 'bg-gray-200 hover:bg-gray-300'
-                            }`}
-                    >
-                        Alertas ({alertData.length})
-                    </button>
-                    <button
-                        onClick={() => setSearchTerm('type:alert')}
-                        className={`px-3 py-1 text-sm rounded transition-colors ${searchTerm === 'type:alert'
-                            ? 'bg-purple-500 text-white'
-                            : 'bg-gray-200 hover:bg-gray-300'
-                            }`}
-                    >
-                        Alertas Procesadas ({alerts.length})
-                    </button>
 
-                    {/* Contadores de alertas procesadas */}
-                    <div className="flex items-center space-x-2 ml-4 text-xs">
-                        <span className="text-gray-600">Alertas Activas:</span>
-                        {criticalAlertsCount > 0 && (
-                            <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full">
-                                🔴 {criticalAlertsCount}
+                {/* Filtros mejorados con diseño moderno */}
+                <div className="mb-6 space-y-4">
+                    {/* Fila de filtros principales */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <button
+                            onClick={() => {setSearchTerm(''); setCurrentPage(1);}}
+                            className={`group cursor-pointer relative px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${!searchTerm
+                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-200'
+                                : 'bg-white border border-gray-200 text-gray-700 hover:border-blue-300 hover:shadow-sm'
+                                }`}
+                        >
+                            <span className="flex items-center gap-2">
+                                Todos
+                                <span className={`px-2 py-0.5 rounded-full text-xs ${!searchTerm ? 'bg-white/20' : 'bg-gray-100'
+                                    }`}>
+                                    {totalCount}
+                                </span>
                             </span>
-                        )}
-                        {warningAlertsCount > 0 && (
-                            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
-                                🟡 {warningAlertsCount}
+                        </button>
+
+                        <button
+                            onClick={() => {setSearchTerm('status:OK'); setCurrentPage(1);}}
+                            className={`group cursor-pointer relative px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${searchTerm === 'status:OK'
+                                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md shadow-green-200'
+                                : 'bg-white border border-gray-200 text-gray-700 hover:border-green-300 hover:shadow-sm'
+                                }`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full ${searchTerm === 'status:OK' ? 'bg-white' : 'bg-green-500'
+                                    }`}></span>
+                                OK
+                                <span className={`px-2 py-0.5 rounded-full text-xs ${searchTerm === 'status:OK' ? 'bg-white/20' : 'bg-gray-100'
+                                    }`}>
+                                    {okCount}
+                                </span>
                             </span>
-                        )}
-                        {infoAlertsCount > 0 && (
-                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                                🔵 {infoAlertsCount}
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                setCurrentPage(1);
+                                setSearchTerm('status:WARNING,DANGER,ERROR')
+                            }}
+                            className={`group cursor-pointer relative px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${searchTerm === 'status:WARNING,DANGER,ERROR'
+                                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md shadow-red-200'
+                                : 'bg-white border border-gray-200 text-gray-700 hover:border-red-300 hover:shadow-sm'
+                                }`}
+                        >
+                            <span className="flex cursor-pointer items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full ${searchTerm === 'status:WARNING,DANGER,ERROR' ? 'bg-white' : 'bg-red-500'
+                                    }`}></span>
+                                Alertas
+                                <span className={`px-2 py-0.5 rounded-full text-xs ${searchTerm === 'status:WARNING,DANGER,ERROR' ? 'bg-white/20' : 'bg-gray-100'
+                                    }`}>
+                                    {alertData.length}
+                                </span>
                             </span>
-                        )}
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                setSearchTerm('type:alert')
+                                setCurrentPage(1);
+
+                            }}
+                            className={`group relative px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${searchTerm === 'type:alert'
+                                ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-200'
+                                : 'bg-white border border-gray-200 text-gray-700 hover:border-purple-300 hover:shadow-sm'
+                                }`}
+                        >
+                            <span className="flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full ${searchTerm === 'type:alert' ? 'bg-white' : 'bg-purple-500'
+                                    }`}></span>
+                                Procesadas
+                                <span className={`px-2 py-0.5 rounded-full text-xs ${searchTerm === 'type:alert' ? 'bg-white/20' : 'bg-gray-100'
+                                    }`}>
+                                    {alerts.length}
+                                </span>
+                            </span>
+                        </button>
+
+                        {/* Separador vertical */}
+                        <div className="hidden sm:block w-px h-8 bg-gray-200"></div>
+
+                        {/* Barra de búsqueda mejorada */}
+                        <div className="relative flex-1 min-w-[250px] max-w-md">
+                            <svg
+                                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <input
+                                type="text"
+                                placeholder="Buscar nodo, tipo o fabricante..."
+                                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                        setCurrentPage(1);
+                                    }}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
                     </div>
+
+                    {/* Badges de alertas activas */}
+                    {(criticalAlertsCount > 0 || warningAlertsCount > 0 || infoAlertsCount > 0) && (
+                        <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-100">
+                            <span className="text-sm font-medium text-gray-700">Alertas Activas:</span>
+                            <div className="flex items-center gap-2">
+                                {criticalAlertsCount > 0 && (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 rounded-full text-sm font-medium border border-red-100">
+                                        <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                                        Críticas: {criticalAlertsCount}
+                                    </span>
+                                )}
+                                {warningAlertsCount > 0 && (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-sm font-medium border border-yellow-100">
+                                        <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                                        Advertencias: {warningAlertsCount}
+                                    </span>
+                                )}
+                                {infoAlertsCount > 0 && (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium border border-blue-100">
+                                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                        Info: {infoAlertsCount}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Tabla (mantener tu JSX existente) */}
                 <div className="overflow-x-auto bg-white rounded-lg shadow">
-                    <table className="w-full border-collapse">
-                        <thead>
-                            <tr className="bg-gray-800 text-white">
+                    <div className="bg-black px-6 py-4">
+                        <h2 className="text-white font-bold text-lg">Zonas Mineras</h2>
+                        <p className="text-indigo-100 text-sm">Gestión de minas y áreas de monitoreo</p>
+                    </div>
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr >
                                 <th
-                                    className="px-6 py-3 text-left text-xs font-medium uppercase cursor-pointer hover:bg-gray-700"
+                                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                                     onClick={() => requestSort('node_id')}
                                 >
                                     Nodo {sortConfig?.key === 'node_id' ? (sortConfig.direction === 'ascending' ? '↑' : '↓') : ''}
                                 </th>
                                 <th
-                                    className="px-6 py-3 text-left text-xs font-medium uppercase cursor-pointer hover:bg-gray-700"
+                                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer "
                                     onClick={() => requestSort('type')}
                                 >
                                     Tipo {sortConfig?.key === 'type' ? (sortConfig.direction === 'ascending' ? '↑' : '↓') : ''}
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                                     Valor
                                 </th>
                                 <th
-                                    className="px-6 py-3 text-left text-xs font-medium uppercase cursor-pointer hover:bg-gray-700"
+                                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer "
                                     onClick={() => requestSort('manufacturer')}
                                 >
                                     Fabricante {sortConfig?.key === 'manufacturer' ? (sortConfig.direction === 'ascending' ? '↑' : '↓') : ''}
                                 </th>
                                 <th
-                                    className="px-6 py-3 text-left text-xs font-medium uppercase cursor-pointer hover:bg-gray-700"
+                                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer "
                                     onClick={() => requestSort('timestamp')}
                                 >
                                     Fecha {sortConfig?.key === 'timestamp' ? (sortConfig.direction === 'ascending' ? '↑' : '↓') : ''}
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase">
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
                                     Estado
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="bg-white divide-y divide-gray-200">
                             {paginatedData.length > 0 ? (
                                 paginatedData.map((item, index) => {
                                     // Obtener la alerta completa para este sensor
@@ -353,7 +413,7 @@ export default function DeviceTable() {
                                                 }`}
                                             onClick={() => handleRowClick(alert ? alert.sensorData : item)}
                                         >
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            <td className="px-6 py-4 text-centerwhitespace-nowrap text-sm font-medium text-gray-900">
                                                 <div className="flex items-center">
                                                     {hasAlert && (
                                                         <span className={`
@@ -452,53 +512,15 @@ export default function DeviceTable() {
                             )}
                         </tbody>
                     </table>
+                    <PaginationControls
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        variant="bottom"
+                    />
                 </div>
 
-                {/* Paginación (mantener tu JSX existente) */}
-                <div className="mt-4 flex justify-between items-center">
-                    <div className="text-sm text-gray-600">
-                        Mostrando {paginatedData.length} de {filteredData.length} registros
-                        {searchTerm && ` • Filtro: "${searchTerm}"`}
-                    </div>
-                    <div className="flex space-x-1">
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                            let pageNum;
-                            if (totalPages <= 5) {
-                                pageNum = i + 1;
-                            } else if (currentPage <= 3) {
-                                pageNum = i + 1;
-                            } else if (currentPage >= totalPages - 2) {
-                                pageNum = totalPages - 4 + i;
-                            } else {
-                                pageNum = currentPage - 2 + i;
-                            }
 
-                            return (
-                                <button
-                                    key={pageNum}
-                                    onClick={() => setCurrentPage(pageNum)}
-                                    className={`px-3 py-1 rounded transition-colors ${currentPage === pageNum
-                                        ? 'bg-blue-500 text-white'
-                                        : 'bg-gray-200 hover:bg-gray-300'
-                                        }`}
-                                >
-                                    {pageNum}
-                                </button>
-                            );
-                        })}
-                        {totalPages > 5 && currentPage < totalPages - 2 && (
-                            <span className="px-3 py-1 text-gray-500">...</span>
-                        )}
-                        {totalPages > 5 && currentPage < totalPages - 2 && (
-                            <button
-                                onClick={() => setCurrentPage(totalPages)}
-                                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                            >
-                                {totalPages}
-                            </button>
-                        )}
-                    </div>
-                </div>
             </div>
         </div>
     );

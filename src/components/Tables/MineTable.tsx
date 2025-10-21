@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import { MineZone } from '../../interfaces/Mines';
+import PaginationControls from '../PaginationControls';
 
 interface MineTableProps {
     mines: MineZone[];
     onEdit: (mine: MineZone) => void;
     onView: (mine: MineZone) => void;
     onDelete: (id: string) => void;
+    totalPages: number;
+    currentPage: number;
+    onPageChange: (page: number) => void;
 }
 
-export const MineTable = ({ mines, onEdit, onView, onDelete }: MineTableProps) => {
+export const MineTable = ({ mines, onEdit, onView, onDelete, totalPages, currentPage, onPageChange }: MineTableProps) => {
     const [hoveredRow, setHoveredRow] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+
 
     const handleDelete = (id: string) => {
         setDeletingId(id);
@@ -187,6 +192,13 @@ export const MineTable = ({ mines, onEdit, onView, onDelete }: MineTableProps) =
                     </tbody>
                 </table>
             </div>
+            {/* Paginación */}
+            <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                variant="bottom"
+            />
 
             {/* Footer informativo */}
             <div className="bg-gray-50 px-6 py-3 text-right text-xs text-gray-500">

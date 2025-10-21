@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { Server, Cpu, AlertCircle, Plus, TrendingUp, Activity, Radio } from 'lucide-react';
+import { Server, Cpu, AlertCircle, Plus, TrendingUp, Activity, Radio, ArrowLeft } from 'lucide-react';
 import { IoTGateway, IoTGatewayStats } from '../../interfaces/IoTGateways';
 import { IoTGatewayService } from '../../services/IotGatewaysServices';
 import { IoTGatewayTable } from '../Tables/IotGatewayTable';
@@ -97,7 +97,9 @@ export const IoTGatewayDashboard = () => {
   })) : [];
 
 
-
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   const StatCard = ({ icon: Icon, title, value, color, bgColor, trend }: any) => (
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
       <div className="flex items-start justify-between mb-4">
@@ -119,30 +121,33 @@ export const IoTGatewayDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-blue-50">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
-        {/* Header con gradiente */}
-        <div className="bg-gradient-to-r from-indigo-500 to-blue-600 rounded-3xl shadow-2xl p-8 mb-8">
+
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">Gestión de IoT Gateways</h1>
-              <p className="text-purple-100 text-lg">Monitoreo y control de dispositivos IoT en tiempo real</p>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+                Gestión de IoT Gateways
+              </h1>
+              <p className="text-gray-600 mt-2">Monitoreo y control de dispositivos IoT en tiempo real</p>
             </div>
             {view === 'list' && (
-              <button 
+              <button
                 onClick={handleCreate}
-                className="flex items-center space-x-2 px-6 py-3 bg-white text-purple-700 rounded-xl hover:bg-purple-50 shadow-lg transform hover:scale-105 transition-all duration-200 font-semibold"
+                className="px-6 py-3 bg-gradient-to-r cursor-pointer from-indigo-600 to-blue-600 text-white rounded-lg hover:from-indigo-700 hover:to-blue-700 flex items-center space-x-2 shadow-lg transform hover:scale-105 transition-all duration-200"
               >
                 <Plus className="w-5 h-5" />
-                <span>Nuevo Gateway</span>
+                <span className="font-medium">Nuevo Gateway</span>
               </button>
             )}
             {view !== 'list' && (
               <button
                 onClick={() => setView('list')}
-                className="flex items-center space-x-2 px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-50 shadow-lg transform hover:scale-105 transition-all duration-200 font-semibold"
+                className="px-6 py-3 bg-gradient-to-r cursor-pointer from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 flex items-center space-x-2 shadow-lg transform hover:scale-105 transition-all duration-200"
               >
-                <span>← Volver</span>
+                <ArrowLeft className="w-5 h-5" />
+                <span className="font-medium">Volver al Listado</span>
               </button>
             )}
           </div>
@@ -209,31 +214,31 @@ export const IoTGatewayDashboard = () => {
                     <BarChart data={brandData}>
                       <defs>
                         <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#8B5CF6" stopOpacity={1}/>
-                          <stop offset="100%" stopColor="#6366F1" stopOpacity={0.8}/>
+                          <stop offset="0%" stopColor="#8B5CF6" stopOpacity={1} />
+                          <stop offset="100%" stopColor="#6366F1" stopOpacity={0.8} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis 
-                        dataKey="name" 
+                      <XAxis
+                        dataKey="name"
                         tick={{ fill: '#6B7280', fontSize: 12 }}
                         axisLine={{ stroke: '#E5E7EB' }}
                       />
-                      <YAxis 
+                      <YAxis
                         tick={{ fill: '#6B7280', fontSize: 12 }}
                         axisLine={{ stroke: '#E5E7EB' }}
                       />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#fff', 
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#fff',
                           border: '1px solid #E5E7EB',
                           borderRadius: '12px',
                           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                         }}
                       />
-                      <Bar 
-                        dataKey="count" 
-                        fill="url(#colorBar)" 
+                      <Bar
+                        dataKey="count"
+                        fill="url(#colorBar)"
                         radius={[8, 8, 0, 0]}
                       />
                     </BarChart>
@@ -269,16 +274,16 @@ export const IoTGatewayDashboard = () => {
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#fff', 
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#fff',
                           border: '1px solid #E5E7EB',
                           borderRadius: '12px',
                           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                         }}
                       />
-                      <Legend 
-                        verticalAlign="bottom" 
+                      <Legend
+                        verticalAlign="bottom"
                         height={36}
                         iconType="circle"
                       />
@@ -305,18 +310,27 @@ export const IoTGatewayDashboard = () => {
             onDelete={handleDelete}
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            onPageChange={handlePageChange}
           />
         ) : view === 'form' ? (
-          <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">
-              {selectedGateway ? 'Editar IoT Gateway' : 'Crear Nuevo IoT Gateway'}
-            </h2>
-            <IoTGatewayForm
-              initialData={selectedGateway || undefined}
-              onSuccess={handleFormSuccess}
-              onCancel={() => setView('list')}
-            />
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <div className="bg-gradient-to-r from-indigo-500 to-blue-600 px-6 py-4">
+              <h2 className="text-white font-bold text-lg">
+                {selectedGateway ? 'Editar IoT Gateway' : 'Crear Nuevo IoT Gateway'}
+              </h2>
+              <p className="text-indigo-100 text-sm">
+                {selectedGateway ? 'Modifique la información del IoT Gateway' : 'Complete el formulario para registrar un nuevo IoT Gateway'}
+              </p>
+            </div>
+            <div className="p-8">
+
+              <IoTGatewayForm
+                initialData={selectedGateway || undefined}
+                onSuccess={handleFormSuccess}
+                onCancel={() => setView('list')}
+              />
+            </div>
+
           </div>
         ) : view === 'detail' && selectedGateway ? (
           <IoTGatewayDetailModal

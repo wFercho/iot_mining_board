@@ -5,6 +5,7 @@ import { SensorForm } from '../components/Forms/SensorForm';
 import { SensorTable } from '../components/Tables/SensorTables';
 import SensorChart from './SensorChart';
 import { Sensor } from '../interfaces/Sensors';
+import { ArrowLeft, Plus } from 'lucide-react';
 
 export const SensorDashboard = () => {
   const [view, setView] = useState<'list' | 'form' | 'detail'>('list');
@@ -69,27 +70,40 @@ export const SensorDashboard = () => {
     fetchSensors(currentPage);
     setView('list');
   };
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Gestión de Sensores</h1>
-        {view === 'list' && (
-          <button
-            onClick={handleCreate}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Nuevo Sensor
-          </button>
-        )}
-        {view !== 'list' && (
-          <button
-            onClick={() => setView('list')}
-            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-          >
-            Volver
-          </button>
-        )}
+
+      <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-100">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+              Nuevo Sensor
+            </h1>
+            <p className="text-gray-600 mt-2">Sistema de monitoreo y gestión integral</p>
+          </div>
+          {view === 'list' && (
+            <button
+              onClick={handleCreate}
+              className="px-6 py-3 bg-gradient-to-r cursor-pointer from-indigo-600 to-blue-600 text-white rounded-lg hover:from-indigo-700 hover:to-blue-700 flex items-center space-x-2 shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="font-medium">Nuevo Sensor</span>
+            </button>
+          )}
+          {view !== 'list' && (
+            <button
+              onClick={() => setView('list')}
+              className="px-6 py-3 bg-gradient-to-r cursor-pointer from-gray-600 to-gray-700 text-white rounded-lg hover:from-gray-700 hover:to-gray-800 flex items-center space-x-2 shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="font-medium">Volver al Listado</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -109,36 +123,31 @@ export const SensorDashboard = () => {
             onEdit={handleEdit}
             onView={handleView}
             onDelete={handleDelete}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
           />
-          <div className="mt-4 flex justify-between items-center">
-            <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border rounded disabled:opacity-50"
-            >
-              Anterior
-            </button>
-            <span>Página {currentPage} de {totalPages}</span>
-            <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 border rounded disabled:opacity-50"
-            >
-              Siguiente
-            </button>
-          </div>
+
         </>
       ) : view === 'form' ? (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">
-            {selectedSensor ? 'Editar Sensor' : 'Crear Nuevo Sensor'}
-          </h2>
-          <SensorForm
-            initialData={selectedSensor || undefined}
-            onSuccess={handleFormSuccess}
-            onCancel={() => setView('list')}
-          />
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+          <div className="bg-gradient-to-r from-indigo-500 to-blue-600 px-6 py-4">
+            <h2 className="text-white font-bold text-lg">
+              {selectedSensor ? 'Editar Sensor' : 'Crear Nuevo Sensor'}
+            </h2>
+            <p className="text-indigo-100 text-sm">
+              {selectedSensor ? 'Modifique la información del sensor' : 'Complete el formulario para registrar un nuevo sensor'}
+            </p>
+          </div>
+          <div className="p-8">
+            <SensorForm
+              initialData={selectedSensor || undefined}
+              onSuccess={handleFormSuccess}
+              onCancel={() => setView('list')}
+            />
+          </div>
         </div>
+
       ) : view === 'detail' && selectedSensor ? (
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
