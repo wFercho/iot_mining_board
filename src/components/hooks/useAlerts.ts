@@ -120,7 +120,6 @@ export const useAlerts = (): UseAlertsReturn => {
             sensorId: sensorData.id
         });
 
-        console.log(`📢 Notificación ${alertType}:`, alertMessage);
 
     }, [addAlert]);
 
@@ -131,9 +130,6 @@ export const useAlerts = (): UseAlertsReturn => {
     ): boolean => {
         if (!rule.isActive) return false;
         if (sensorData.type !== rule.sensorType) return false;
-
-
-        console.log(sensorData)
 
         const value = sensorData.value;
 
@@ -175,9 +171,6 @@ export const useAlerts = (): UseAlertsReturn => {
                 typeof sensorData.value !== 'number') {
                 return;
             }
-
-            console.log("🔍 useAlerts: Evaluando sensor", sensorData.type, sensorData.value);
-
             // Obtener reglas activas
             const activeRules = activeRulesRef.current;
             let matchedRule: AlertRule | undefined;
@@ -186,7 +179,6 @@ export const useAlerts = (): UseAlertsReturn => {
             for (const rule of activeRules) {
                 if (evaluateRule(sensorData, rule)) {
                     matchedRule = rule;
-                    console.log("✅ useAlerts: Regla activada -", rule.name);
                     break; // Usar la primera regla que coincida
                 }
             }
@@ -213,7 +205,6 @@ export const useAlerts = (): UseAlertsReturn => {
 
                 // Ejecutar acciones automáticas si la regla lo especifica
                 if (matchedRule?.autoActions && matchedRule.autoActions.length > 0) {
-                    console.log("🤖 Acciones automáticas:", matchedRule.autoActions);
                     // Aquí puedes ejecutar las acciones automáticas
                     // Por ejemplo, enviar notificaciones, activar sistemas, etc.
                 }
@@ -231,12 +222,10 @@ export const useAlerts = (): UseAlertsReturn => {
 
     const clearAlerts = useCallback((): void => {
         setAlerts([]);
-        console.log("🧹 Alertas limpiadas");
     }, []);
 
     const dismissAlert = useCallback((id: string): void => {
         setAlerts(prev => prev.filter(alert => alert.id !== id));
-        console.log("🗑️ Alerta descartada:", id);
     }, []);
 
     // Contadores por tipo

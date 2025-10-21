@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Bell, Menu, User, Moon, Sun } from 'lucide-react';
+import { Bell, Menu, Moon, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../Context/NotificationsContext';
+import { UserProfileDropdown } from './UserProfile/UserProfileDropdown';
 
 interface NavbarProps {
   toggleSidebar: () => void;
+  onThemeChange?: (isDark: boolean) => void;
 }
 
-export const Navbar = ({ toggleSidebar }: NavbarProps) => {
+export const Navbar = ({ toggleSidebar, onThemeChange }: NavbarProps) => {
   const { alerts, markAsRead, unreadCount } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -20,11 +22,15 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
     const shouldBeDark = savedTheme === 'dark' || (!savedTheme && systemDark);
 
     setIsDarkMode(shouldBeDark);
+    onThemeChange?.(shouldBeDark);
 
+    // Aplicar clase dark al html
     if (shouldBeDark) {
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
-  }, []);
+  }, [onThemeChange]);
 
   const handleNotificationClick = (sensorId: string) => {
     console.log(sensorId, "sensorId");
@@ -40,14 +46,16 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
   const toggleTheme = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
+    onThemeChange?.(newDarkMode);
 
+    // Aplicar/remover clase dark
     if (newDarkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
-
-    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
   };
 
   return (
@@ -118,21 +126,21 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
                     <div
                       key={alert.id}
                       className={`p-3 border-b border-gray-100 dark:border-gray-600 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 ${alert.type === 'DANGER' || alert.type === 'ERROR'
-                          ? 'bg-red-50 dark:bg-red-900/20'
-                          : 'bg-yellow-50 dark:bg-yellow-900/20'
+                        ? 'bg-red-50 dark:bg-red-900/20'
+                        : 'bg-yellow-50 dark:bg-yellow-900/20'
                         }`}
                       onClick={() => handleNotificationClick(alert.sensorId)}
                     >
                       <div className="flex justify-between items-start">
                         <span className={`text-sm font-medium ${alert.type === 'DANGER' || alert.type === 'ERROR'
-                            ? 'text-red-700 dark:text-red-300'
-                            : 'text-yellow-700 dark:text-yellow-300'
+                          ? 'text-red-700 dark:text-red-300'
+                          : 'text-yellow-700 dark:text-yellow-300'
                           }`}>
                           {alert.message}
                         </span>
                         <span className={`text-xs px-2 py-1 rounded-full ${alert.type === 'DANGER' || alert.type === 'ERROR'
-                            ? 'bg-red-100 dark:bg-red-800/50 text-red-800 dark:text-red-200'
-                            : 'bg-yellow-100 dark:bg-yellow-800/50 text-yellow-800 dark:text-yellow-200'
+                          ? 'bg-red-100 dark:bg-red-800/50 text-red-800 dark:text-red-200'
+                          : 'bg-yellow-100 dark:bg-yellow-800/50 text-yellow-800 dark:text-yellow-200'
                           }`}>
                           {alert.type}
                         </span>
@@ -154,12 +162,8 @@ export const Navbar = ({ toggleSidebar }: NavbarProps) => {
           )}
         </div>
 
-        <button
-          className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors duration-200"
-          aria-label="User Profile"
-        >
-          <User size={24} />
-        </button>
+        <UserProfileDropdown />
+
       </div>
     </nav>
   );

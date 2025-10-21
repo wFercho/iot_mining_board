@@ -2,7 +2,7 @@
 // components/SensorModal.tsx
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { SensorData } from '../interfaces/Sensors';
+import { SensorData } from '../../interfaces/Sensors';
 
 interface SensorModalProps {
   sensor: SensorData | null;

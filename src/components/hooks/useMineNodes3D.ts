@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import axios from "axios";
-import { MineNodes3D, INodeRealTimeData } from "../interfaces/main";
+import { MineNodes3D, INodeRealTimeData } from "../../interfaces/main";
 
 const MINES_API_HOST = "localhost:8080";
 export const useMineNodes3D = (minaId: string) => {

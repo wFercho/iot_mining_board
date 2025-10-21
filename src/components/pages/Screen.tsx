@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Billboard, OrbitControls, Text } from "@react-three/drei";
 import { Matrix4, Mesh, Vector3 } from "three";
-import { useMineNodes3D } from "../../hooks/useMineNodes3D";
+import { useMineNodes3D } from "../hooks/useMineNodes3D";
 import { INodeIn3D, ZoneCategory } from "../../interfaces/main";
 
 interface SensorProps {

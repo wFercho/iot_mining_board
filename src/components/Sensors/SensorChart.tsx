@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { RefreshCw } from 'lucide-react';
-import { SensorService } from '../services/SensorServices';
-import { Sensor } from '../interfaces/Sensors';
-
+import { Sensor } from '../../interfaces/Sensors';
+import { SensorService } from '../../services/SensorServices';
 interface SensorChartProps {
   sensorId: string;
   initialTimeRange?: string;

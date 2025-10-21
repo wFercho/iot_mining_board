@@ -282,6 +282,7 @@ class WebSocketService {
     return this.maxReconnectAttempts;
   }
 }
+const WS_URL = import.meta.env.WS_URL
 
 // Exportar la instancia singleton
 export const webSocketService = WebSocketService.getInstance("ws://localhost:8000/ws");

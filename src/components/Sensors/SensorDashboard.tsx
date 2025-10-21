@@ -1,11 +1,11 @@
 // pages/SensorDashboard.tsx
 import { useState, useEffect } from 'react';
-import { SensorService } from '../services/SensorServices';
-import { SensorForm } from '../components/Forms/SensorForm';
-import { SensorTable } from '../components/Tables/SensorTables';
 import SensorChart from './SensorChart';
-import { Sensor } from '../interfaces/Sensors';
 import { ArrowLeft, Plus } from 'lucide-react';
+import { SensorService } from '../../services/SensorServices';
+import { Sensor } from '../../interfaces/Sensors';
+import { SensorTable } from '../Tables/SensorTables';
+import { SensorForm } from '../Forms/SensorForm';
 
 export const SensorDashboard = () => {
   const [view, setView] = useState<'list' | 'form' | 'detail'>('list');

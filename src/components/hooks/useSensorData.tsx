@@ -119,7 +119,6 @@ export const useSensorData = (): UseSensorDataReturn => {
             for (const rule of activeRules) {
                 if (evaluateRule(sensorData, rule)) {
                     matchedRule = rule;
-                    console.log("✅ Alerta por regla:", rule.name);
                     break;
                 }
             }
@@ -142,10 +141,7 @@ export const useSensorData = (): UseSensorDataReturn => {
                     return [newAlert, ...filtered].slice(0, MAX_ALERTS);
                 });
 
-                // Ejecutar acciones automáticas
-                if (matchedRule?.autoActions) {
-                    console.log("🤖 Acciones automáticas:", matchedRule.autoActions);
-                }
+                
                 showAlertNotification(sensorData);
             }
 
@@ -180,8 +176,6 @@ export const useSensorData = (): UseSensorDataReturn => {
             sensorId: sensorData.id
         });
 
-        console.log(`📢 Notificación ${alertType}:`, alertMessage);
-
     }, [addAlert]);
 
     const handleWebSocketMessage = useCallback((data: WebSocketMessage): void => {
@@ -207,9 +201,6 @@ export const useSensorData = (): UseSensorDataReturn => {
                 return;
             }
 
-            console.log("📊 Datos recibidos:", {
-                sensorDataItem
-            });
 
             // 1. Guardar datos crudos
             setAllSensorData(prev => {
@@ -263,7 +254,6 @@ export const useSensorData = (): UseSensorDataReturn => {
     const clearAllData = useCallback((): void => {
         setAllSensorData([]);
         setAlerts([]);
-        console.log("🧹 Todos los datos limpiados");
     }, []);
 
     const dismissAlert = useCallback((id: string): void => {

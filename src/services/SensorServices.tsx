@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { Sensor } from '../interfaces/Sensors';
 
-const API_BASE_URL = 'http://localhost:8001';
-
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 
 export const SensorService = {

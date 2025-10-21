@@ -11,14 +11,13 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({
- 
   initialSidebarOpen = true,
   children,
 }) => {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(initialSidebarOpen);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
       {/* Sidebar reutilizable */}
       <Sidebar isOpen={sidebarOpen}>
       </Sidebar>
@@ -32,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({
         </Navbar>
         
         {/* Contenido dinámico */}
-        <div className="p-4 flex-1 overflow-y-auto bg-white">
+        <div className="p-4 flex-1 overflow-y-auto bg-white dark:bg-gray-900 transition-colors duration-300">
           {children || <Outlet />}
         </div>
       </main>

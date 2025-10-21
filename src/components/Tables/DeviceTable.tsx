@@ -1,10 +1,10 @@
 // components/DeviceTable.tsx
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from 'react-router-dom';
-import { SensorModal } from "./SensorModal";
-import { useSensorData } from "./hooks/useSensorData";
-import { SensorData } from "../interfaces/Sensors";
-import PaginationControls from "./PaginationControls";
+import { useSensorData } from "../hooks/useSensorData";
+import { SensorData } from "../../interfaces/Sensors";
+import PaginationControls from "../PaginationControls";
+import { SensorModal } from "../Sensors/SensorModal";
 
 const PAGE_SIZE = 10;
 
@@ -183,7 +183,7 @@ export default function DeviceTable() {
                 />
             )}
 
-            <div className="flex-1  bg-white container mx-auto px-4 py-8">
+            <div className="flex-1 bg-white container mx-auto px-4 py-8">
                 <div className="bg-white rounded-xl shadow-lg p-6 mb-8 ">
                     <div className="flex justify-between items-center">
                         <div>

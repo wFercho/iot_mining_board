@@ -1,5 +1,5 @@
 import Layout from "../MainLayout"
-import { SensorDashboard } from "../SensorDashboard"
+import { SensorDashboard } from "../Sensors/SensorDashboard"
 
 export const SensorPage = () => {
 
