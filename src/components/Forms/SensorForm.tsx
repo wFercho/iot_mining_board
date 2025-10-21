@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
-import { Sensor, SensorService } from '../../services/SensorServices';
+import {  SensorService } from '../../services/SensorServices';
 import { AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { PrecisionSlider } from '../PrecisionSlider';
+import { Sensor } from '../../interfaces/Sensors';
 
 interface SensorFormProps {
   initialData?: Partial<Sensor>;
@@ -103,7 +104,7 @@ const VARIABLE_CONFIGS: Record<string, { min: number; max: number; unit: string;
 const timeUnits = ['s', 'ms', 'us', 'min', 'h'];
 const durabilityUnits = ['años', 'meses', 'dias', 'horas'];
 const voltageTypes = ['DC', 'AC'];
-const installationModes = ['superficie', 'empotrado', 'colgante', 'subterraneo'];
+const installationModes = ['Superficie', 'Empotrado', 'Colgante', 'Subterraneo'];
 const outputTypes = ['Digital', 'Analógica', 'RS485', 'Modbus', '4-20mA', '0-10V'];
 
 export const SensorForm = ({ initialData, onSuccess, onCancel }: SensorFormProps) => {
@@ -228,7 +229,7 @@ export const SensorForm = ({ initialData, onSuccess, onCancel }: SensorFormProps
     }
 
     setLoading(true);
-
+    console.log(formData)
     try {
       if (formData.id) {
         await SensorService.updateSensor(formData.id, formData);

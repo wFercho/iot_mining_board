@@ -3,7 +3,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 interface AlertNotification {
     id: string;
     message: string;
-    type: 'WARNING' | 'DANGER' | 'ERROR';
+    type: 'WARNING' | 'DANGER' | 'ERROR' | 'INFO';
     timestamp: Date;
     sensorId: string;
 }

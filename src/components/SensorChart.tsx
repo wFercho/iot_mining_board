@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { RefreshCw } from 'lucide-react';
-import { SensorService, Sensor } from '../services/SensorServices';
+import { SensorService } from '../services/SensorServices';
+import { Sensor } from '../interfaces/Sensors';
 
 interface SensorChartProps {
   sensorId: string;

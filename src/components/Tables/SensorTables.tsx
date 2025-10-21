@@ -1,5 +1,5 @@
-import { Sensor } from '../../services/SensorServices';
 import { useState } from 'react';
+import { Sensor } from '../../interfaces/Sensors';
 
 interface SensorTableProps {
   sensors: Sensor[];

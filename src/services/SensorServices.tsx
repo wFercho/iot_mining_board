@@ -1,43 +1,9 @@
 import axios from 'axios';
+import { Sensor } from '../interfaces/Sensors';
 
 const API_BASE_URL = 'http://localhost:8001';
 
-export interface Sensor {
-  id: string;
-  variable: string;
-  marca: string;
-  referencia: number;
-  id_node: string;
-  unidad_medicion: string;
-  max_medicion: number;
-  min_medicion: number;
-  precision: number;
-  tiempo_respuesta_valor: number;
-  tiempo_respuesta_unidad: string;
-  resolucion: number;
-  temperatura_max: number;
-  temperatura_min: number;
-  voltaje_tipo: string;
-  voltaje_min: number;
-  voltaje_max: number;
-  corriente_min: number;
-  corriente_max: number;
-  durabilidad_valor: number;
-  durabilidad_unidad: string;
-  modo_instalacion: string;
-  tipo_salida: string;
-  certificados: string;
-  created_at?: string;
-  updated_at?: string;
-}
 
-export interface Node {
-  id: string;
-  name: string;
-  description?: string;
-  location?: string;
-  status?: string;
-}
 
 export const SensorService = {
   // Obtener todos los sensores

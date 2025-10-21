@@ -1,9 +1,10 @@
 // pages/SensorDashboard.tsx
 import { useState, useEffect } from 'react';
-import { Sensor, SensorService } from '../services/SensorServices';
+import { SensorService } from '../services/SensorServices';
 import { SensorForm } from '../components/Forms/SensorForm';
 import { SensorTable } from '../components/Tables/SensorTables';
 import SensorChart from './SensorChart';
+import { Sensor } from '../interfaces/Sensors';
 
 export const SensorDashboard = () => {
   const [view, setView] = useState<'list' | 'form' | 'detail'>('list');
@@ -138,7 +139,7 @@ export const SensorDashboard = () => {
             onCancel={() => setView('list')}
           />
         </div>
-      )  : view === 'detail' && selectedSensor ? (
+      ) : view === 'detail' && selectedSensor ? (
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Detalle del Sensor</h2>
@@ -161,9 +162,9 @@ export const SensorDashboard = () => {
           {/* Componente SensorChart integrado */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-semibold mb-4">Histórico de Mediciones</h3>
-            <SensorChart 
-              sensorId={selectedSensor.id} 
-              initialTimeRange="24h" 
+            <SensorChart
+              sensorId={selectedSensor.id}
+              initialTimeRange="24h"
             />
           </div>
         </div>

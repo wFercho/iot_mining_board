@@ -1,11 +1,11 @@
 import Layout from "../MainLayout"
-import { SensorDashboard } from "../SensorDashboard"
+import { MineDashboard } from "../Mines/MineDashBoards"
 
-export const MinePage = () => {
+export const MinesPage = () => {
 
     return  (
         <Layout>
-            <SensorDashboard/>
+            <MineDashboard/>
         </Layout>
     )
 }

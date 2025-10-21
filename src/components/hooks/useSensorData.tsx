@@ -1,0 +1,302 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+// hooks/useSensorData.ts
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { useWebSocket } from './useWebSocket';
+import { WebSocketMessage } from '../../services/websocketService';
+import { Alert } from './useAlerts';
+import { AlertRule, useAlertRules } from '../context/AlertRulesContext';
+import { useNotifications } from '../../Context/NotificationsContext';
+import { SensorData } from '../../interfaces/Sensors';
+
+interface UseSensorDataReturn {
+    // Datos crudos de todos los sensores
+    allSensorData: SensorData[];
+    // Alertas procesadas
+    alerts: Alert[];
+    // Estado de conexión
+    isConnected: boolean;
+    connectionState: 'connecting' | 'open' | 'closed' | 'error';
+    // Métodos
+    clearAllData: () => void;
+    dismissAlert: (id: string) => void;
+    // Contadores
+    totalCount: number;
+    okCount: number;
+    warningCount: number;
+    dangerCount: number;
+    errorCount: number;
+    criticalAlertsCount: number;
+    warningAlertsCount: number;
+    infoAlertsCount: number;
+    // Datos combinados para la tabla
+    getTableData: () => (SensorData)[];
+}
+
+const MAX_SENSOR_DATA = 1000;
+const MAX_ALERTS = 100;
+
+export const useSensorData = (): UseSensorDataReturn => {
+    const [allSensorData, setAllSensorData] = useState<SensorData[]>([]);
+    const [alerts, setAlerts] = useState<Alert[]>([]);
+    const { addAlert } = useNotifications();
+
+    // Usar el contexto de reglas
+    const { getActiveRules } = useAlertRules();
+    const activeRulesRef = useRef<AlertRule[]>([]);
+
+    // Actualizar ref con reglas activas
+    useEffect(() => {
+        activeRulesRef.current = getActiveRules();
+    }, [getActiveRules]);
+
+    const sensorDataToAlert = useCallback((
+        data: SensorData,
+        rule?: AlertRule
+    ): Alert => {
+        const alertType: 'critical' | 'warning' | 'info' =
+            data.status === 'DANGER' || data.status === 'ERROR' ? 'critical' :
+                data.status === 'WARNING' ? 'warning' : 'info';
+
+        const modifiedSensorData: SensorData = {
+            ...data,
+            status: alertType === 'critical' ? 'DANGER' : 'WARNING'
+        };
+        return {
+            type: rule?.level || alertType,
+            sensor: `${data.type} - ${data.node_id}`,
+            zone: `Zona ${data.manufacturer}`,
+            value: `${data.value.toFixed(2)} ${data.unit}`,
+            time: new Date(data.timestamp).toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }),
+            message: rule
+                ? `⚠️ ${rule.name}: ${data.value} ${data.unit} (${getConditionText(rule)})`
+                : `Estado: ${data.status}. Sensor ${data.model} reporta valor fuera de rango normal.`,
+            id: `alert_${data.id}_${Date.now()}`,
+            ruleId: rule?.id,
+            sensorData: modifiedSensorData,
+        };
+    }, []);
+    
+
+    const getConditionText = (rule: AlertRule): string => {
+        switch (rule.condition) {
+            case 'greater': return `> ${rule.value}`;
+            case 'less': return `< ${rule.value}`;
+            case 'equal': return `= ${rule.value}`;
+            case 'range': return `${rule.value} - ${rule.maxValue}`;
+            default: return '';
+        }
+    };
+
+    const evaluateRule = useCallback((
+        sensorData: SensorData,
+        rule: AlertRule
+    ): boolean => {
+        if (!rule.isActive) return false;
+        if (sensorData.type !== rule.sensorType) return false;
+
+
+
+        const value = sensorData.value;
+        switch (rule.condition) {
+            case 'greater': return value > rule.value;
+            case 'less': return value < rule.value;
+            case 'equal': return Math.abs(value - rule.value) < 0.01;
+            case 'range': return rule.maxValue ? value >= rule.value && value <= rule.maxValue : false;
+            default: return false;
+        }
+    }, []);
+
+    const processSensorDataForAlerts = useCallback((sensorData: SensorData): void => {
+        try {
+            const activeRules = activeRulesRef.current;
+            let matchedRule: AlertRule | undefined;
+
+            // Evaluar contra reglas activas
+            for (const rule of activeRules) {
+                if (evaluateRule(sensorData, rule)) {
+                    matchedRule = rule;
+                    console.log("✅ Alerta por regla:", rule.name);
+                    break;
+                }
+            }
+
+            // Crear alerta si hay regla que coincide o si el status es de alerta
+            const shouldCreateAlert = matchedRule ||
+                sensorData.status === 'WARNING' ||
+                sensorData.status === 'DANGER' ||
+                sensorData.status === 'ERROR';
+
+            if (shouldCreateAlert) {
+                const newAlert: Alert = sensorDataToAlert(sensorData, matchedRule);
+
+                setAlerts(prev => {
+                    // Reemplazar alerta anterior del mismo sensor y regla
+                    const filtered = prev.filter(
+                        alert => !(alert.sensorData.id === sensorData.id &&
+                            alert.ruleId === matchedRule?.id)
+                    );
+                    return [newAlert, ...filtered].slice(0, MAX_ALERTS);
+                });
+
+                // Ejecutar acciones automáticas
+                if (matchedRule?.autoActions) {
+                    console.log("🤖 Acciones automáticas:", matchedRule.autoActions);
+                }
+                showAlertNotification(sensorData);
+            }
+
+        } catch (error) {
+            console.warn("⚠️ Error procesando alertas:", error);
+        }
+    }, [sensorDataToAlert, evaluateRule]);
+
+    // Mostrar notificación para todos los estados
+    const showAlertNotification = useCallback((sensorData: SensorData) => {
+        const alertMessage = `Sensor ${sensorData.node_id} (${sensorData.type}): ${sensorData.value} ${sensorData.unit}`;
+
+        let alertType: 'INFO' | 'WARNING' | 'DANGER' | 'ERROR' = 'INFO';
+
+        switch (sensorData.status) {
+            case 'WARNING':
+                alertType = 'WARNING';
+                break;
+            case 'DANGER':
+                alertType = 'DANGER';
+                break;
+            case 'ERROR':
+                alertType = 'ERROR';
+                break;
+            default:
+                alertType = 'INFO';
+        }
+
+        addAlert({
+            message: alertMessage,
+            type: alertType,
+            sensorId: sensorData.id
+        });
+
+        console.log(`📢 Notificación ${alertType}:`, alertMessage);
+
+    }, [addAlert]);
+
+    const handleWebSocketMessage = useCallback((data: WebSocketMessage): void => {
+        try {
+            let sensorDataItem: SensorData;
+
+            // Parsear mensaje
+            if (typeof data === 'object' && 'id' in data && 'status' in data) {
+                sensorDataItem = data as unknown as SensorData;
+            } else if (typeof data.content === 'string') {
+                sensorDataItem = JSON.parse(data.content);
+            } else if (typeof data === 'object' && data.content && typeof data.content === 'object') {
+                sensorDataItem = data.content as unknown as SensorData;
+            } else {
+                return;
+            }
+
+            // Validar estructura
+            if (!sensorDataItem ||
+                typeof sensorDataItem.id !== 'string' ||
+                typeof sensorDataItem.type !== 'string' ||
+                typeof sensorDataItem.value !== 'number') {
+                return;
+            }
+
+            console.log("📊 Datos recibidos:", {
+                sensorDataItem
+            });
+
+            // 1. Guardar datos crudos
+            setAllSensorData(prev => {
+                const existingIndex = prev.findIndex(
+                    item => item.id === sensorDataItem.id &&
+                        item.timestamp === sensorDataItem.timestamp
+                );
+
+                if (existingIndex !== -1) {
+                    const updated = [...prev];
+                    updated[existingIndex] = sensorDataItem;
+                    return updated.slice(0, MAX_SENSOR_DATA);
+                } else {
+                    return [sensorDataItem, ...prev].slice(0, MAX_SENSOR_DATA);
+                }
+            });
+
+
+            // 2. Procesar para alertas
+            processSensorDataForAlerts(sensorDataItem);
+
+        } catch (error) {
+            console.warn("⚠️ Error procesando mensaje:", error);
+        }
+    }, [processSensorDataForAlerts]);
+
+    const { isConnected, connectionState } = useWebSocket({
+        onMessage: handleWebSocketMessage,
+        autoConnect: true
+    });
+
+    // Datos combinados para la tabla
+    const getTableData = useCallback((): (SensorData)[] => {
+        // Combinar datos crudos con alertas
+        const combinedData = [...allSensorData];
+
+        // Agregar alertas que no estén ya en los datos crudos
+        alerts.forEach(alert => {
+            const alreadyInData = allSensorData.some(
+                data => data.id === alert.sensorData.id &&
+                    data.timestamp === alert.sensorData.timestamp
+            );
+            if (!alreadyInData) {
+                combinedData.push(alert.sensorData);
+            }
+        });
+
+        return combinedData;
+    }, [allSensorData, alerts]);
+
+    const clearAllData = useCallback((): void => {
+        setAllSensorData([]);
+        setAlerts([]);
+        console.log("🧹 Todos los datos limpiados");
+    }, []);
+
+    const dismissAlert = useCallback((id: string): void => {
+        setAlerts(prev => prev.filter(alert => alert.id !== id));
+    }, []);
+
+    // Contadores
+    const totalCount = allSensorData.length;
+    const okCount = allSensorData.filter(item => item.status === 'OK').length;
+    const warningCount = allSensorData.filter(item => item.status === 'WARNING').length;
+    const dangerCount = allSensorData.filter(item => item.status === 'DANGER').length;
+    const errorCount = allSensorData.filter(item => item.status === 'ERROR').length;
+
+    const activeAlerts = alerts;
+    const criticalAlertsCount = alerts.filter(alert => alert.type === 'critical').length;
+    const warningAlertsCount = alerts.filter(alert => alert.type === 'warning').length;
+    const infoAlertsCount = alerts.filter(alert => alert.type === 'info').length;
+
+    return {
+        allSensorData,
+        alerts: activeAlerts,
+        isConnected,
+        connectionState,
+        clearAllData,
+        dismissAlert,
+        totalCount,
+        okCount,
+        warningCount,
+        dangerCount,
+        errorCount,
+        criticalAlertsCount,
+        warningAlertsCount,
+        infoAlertsCount,
+        getTableData
+    };
+};

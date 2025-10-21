@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Billboard, OrbitControls, Text } from "@react-three/drei";
